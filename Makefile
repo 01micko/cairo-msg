@@ -16,9 +16,10 @@ msg.o: cairo-msg.c
 	${CC} -o cairo-msg.o ${CFLAGS} -c cairo-msg.c
 
 install: cairo-msg
-	install -m 0755 -s cairo-msg ${PREFIX}/bin
-	install -m 0644 pixmaps/${PIXMAPS} /usr/share/pixmaps
-	install -m 0644 cairo-msg.1 ${MANDIR}/man1/cairo-msg.1
+	-mkdir -p ${DESTDIR}/${PREFIX}/bin ${DESTDIR}/usr/share/pixmaps ${DESTDIR}/${MANDIR}/man1/
+	install -m 0755 -s cairo-msg ${DESTDIR}/${PREFIX}/bin
+	install -m 0644 pixmaps/${PIXMAPS} ${DESTDIR}/usr/share/pixmaps
+	install -m 0644 cairo-msg.1 ${DESTDIR}/${MANDIR}/man1/cairo-msg.1
 
 uninstall: cairo-msg
 	-rm ${PREFIX}/bin/cairo-msg
