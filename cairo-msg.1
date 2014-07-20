@@ -1,0 +1,49 @@
+.TH CAIRO-MSG 1 "20 July 14"
+.SH NAME
+cairo-msg \- display a message window
+.SH SYNOPSIS
+\fBcairo-msg\fP [ -u | -t | -p -f ] [ -s \fImessage\fP ]
+.SH DESCRIPTION
+\fBcairo-msg\fP displays a short notification
+message in an \fIXwindow\fP on your screen at 
+the specified position [\fB-p\fP], with the specified
+level of \fIurgency\fP [\fB-u\fP], a \fItimeout\fP of
+[\fB-t seconds\fP]and \fIfont\fP [\fB-f font\fP]if specified.
+.SS Options
+.TP
+\fB-u l|n|u\fP
+\fIUrgency\fP. This requires an argument of
+[\fBl\fP] for low urgency (grey), [\fBn\fP] for normal
+urgency (blue) or [\fBu\fP] for high urgency (red).
+The window background changes colour and icon changes.
+.TP
+\fB-t seconds\fP
+\fITimeout\fP. The time in seconds to display the
+message. The default is 10 seconds. 0 is forever.
+.TP
+\fB-p tl|tc|tr|cx|bl|bc|br\fR
+\fIPosition\fP. Specify position on screen.
+\fBtl\fP is \fItop left\fP,
+\fBtc\fP is \fItop centre\fP,
+\fBtr\fP is \fItop right\fP,
+\fBcx\fP is \fIcentre of screen\fP,
+\fBbl\fP is \fIbottom left\fP,
+\fBbc\fP is \fIbottom centre\fP,
+\fBbr\fP is \fIbottom right\fP, (default if not specified)
+.SH FILES
+.TP
+\fC/usr/bin/cairo-msg\fR
+The remote coffee machine device
+.SH "SEE ALSO"
+yaf-splash(5), xmessage(5)
+.SH BUGS
+May not support wide chars well (CJK).
+.SH "AUTHOR"
+.IX Header "AUTHOR"
+Michael Amadio - 01mick@gmail.com
+.SH "COPYRIGHT AND LICENSE"
+.IX Header "COPYRIGHT AND LICENSE"
+\&\fBCopyright (C)\fR 2014 by Author.  
+.PP
+\&\fBcairo-msg\fR is free software; you can redistribute it and/or modify it
+under the terms of the \s-1GPL-v2.0\s0.
