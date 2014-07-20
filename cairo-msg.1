@@ -2,7 +2,7 @@
 .SH NAME
 cairo-msg \- display a message window
 .SH SYNOPSIS
-\fBcairo-msg\fP [ -u | -t | -p -f ] [ -s \fImessage\fP ]
+\fBcairo-msg\fP [ -u | -t | -p | -f ] [ -s \fImessage\fP ]
 .SH DESCRIPTION
 \fBcairo-msg\fP displays a short notification
 message in an \fIXwindow\fP on your screen at 
@@ -30,17 +30,25 @@ message. The default is 10 seconds. 0 is forever.
 \fBbl\fP is \fIbottom left\fP,
 \fBbc\fP is \fIbottom centre\fP,
 \fBbr\fP is \fIbottom right\fP, (default if not specified)
+.TP
+\fB-f "some font on your system"\fP
+\fIFont\fP. A font to display the message.
+.TP
+\fB-s "some message to display"\fP
+\fIMessage\fP. A message string to display which must be quoted
+with single or double quotes. Singe quotes are necessary when
+some special characters are used. The message must be less than 70 
+characters or the program will exit with an error.
 .SH FILES
 .TP
 \fC/usr/bin/cairo-msg\fR
-The remote coffee machine device
 .SH "SEE ALSO"
 yaf-splash(5), xmessage(5)
 .SH BUGS
 May not support wide chars well (CJK).
 .SH "AUTHOR"
 .IX Header "AUTHOR"
-Michael Amadio - 01mick@gmail.com
+Michael Amadio - 01micko@gmail.com
 .SH "COPYRIGHT AND LICENSE"
 .IX Header "COPYRIGHT AND LICENSE"
 \&\fBCopyright (C)\fR 2014 by Author.  
