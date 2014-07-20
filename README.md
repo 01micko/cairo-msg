@@ -19,9 +19,11 @@ BUILD
 -----
 
 Just type 'make'
+
 then to install, as root type 'make install'
 
 By default the binary is installed into /usr/local/bin
+
 To change install paths edit the Makefile.
 
 Alternatively:
