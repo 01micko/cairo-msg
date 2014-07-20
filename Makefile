@@ -1,7 +1,9 @@
 CC = gcc
-CFLAGS=-Wall -pedantic -std=gnu99 -g -I/usr/include `pkg-config --cflags cairo`
-LDFLAGS=-Wall -g `pkg-config --libs cairo` -L/usr/X11R6/lib -lX11
 PREFIX = /usr/local
+LIBDIR = /usr/lib
+# LIBDIR = /usr/lib64
+CFLAGS=-Wall -pedantic -std=gnu99 -g -I/usr/include `pkg-config --cflags cairo`
+LDFLAGS=-Wall -g `pkg-config --libs cairo` -L${LIBDIR} -lX11
 MANDIR = /usr/share/man
 PIXMAPS = {dialog-complete.png,dialog-info.png,dialog-warning.png}
 
