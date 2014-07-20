@@ -59,19 +59,19 @@ void usage(){
 }
 void urgency(char *urge) {
 	
-	if (strncmp(urge, "urgent", strlen(urge)) == 0 ) {
+	if (strcmp(urge, "u") == 0 ) {
 		red = 0.9;
 		green = 0.2;
 		blue = 0.2;
 		icon = "/usr/share/pixmaps/dialog-warning.png";
 	}
-	else if (strncmp(urge, "normal", strlen(urge)) == 0 ) {
+	else if (strcmp(urge, "n") == 0 ) {
 		red = 0.1;
 		green = 0.3;
 		blue = 0.5;
 		icon = "/usr/share/pixmaps/dialog-complete.png";
 	}
-	else if (strncmp(urge, "low", strlen(urge)) == 0 ) {
+	else if (strcmp(urge, "l") == 0 ) {
 		red = 0.3;
 		green = 0.3;
 		blue = 0.3;
