@@ -24,6 +24,8 @@ then to install, as root type 'make install'
 
 By default the binary is installed into /usr/local/bin
 
+On a 64 bit system you may have to edit the Makefile's LIBDIR variable.
+
 To change install paths edit the Makefile.
 
 Alternatively:
