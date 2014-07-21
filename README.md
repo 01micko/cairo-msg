@@ -49,11 +49,17 @@ TODO
 
 REFERENCES
 ----------
-http://www.cairographics.org/manual/cairo-cairo-t.html
-http://www.x.org/releases/X11R7.7/doc/libX11/libX11/libX11.html
-http://man7.org/linux/man-pages/man3/getopt.3.html
+- http://www.cairographics.org/manual/cairo-cairo-t.html
+- http://www.x.org/releases/X11R7.7/doc/libX11/libX11/libX11.html
+- http://man7.org/linux/man-pages/man3/getopt.3.html
 
 Some snippets were borrowed or inspired by these projects:
-http://en.literateprograms.org/Hello_World_(C,_Cairo)
-http://zetcode.com/gfx/cairo/cairoimages/
-https://code.google.com/p/semicomplete/source/browse/codesamples/cairo-example.c
+- http://en.literateprograms.org/Hello_World_(C,_Cairo)
+- http://zetcode.com/gfx/cairo/cairoimages/
+- https://code.google.com/p/semicomplete/source/browse/codesamples/cairo-example.c
+
+Thanks to @zigbert for the icons
+
+Appendix
+--------
+SlackBuild available from http://01micko.com/SlackBuilds/cairo-msg.tar.gz
