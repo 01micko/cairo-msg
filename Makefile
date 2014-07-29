@@ -1,5 +1,5 @@
 CC = gcc
-PREFIX = /usr/local
+PREFIX = /usr
 LIBDIR = /usr/lib
 # LIBDIR = /usr/lib64
 CFLAGS=-Wall -pedantic -std=gnu99 -g -I/usr/include `pkg-config --cflags cairo`
