@@ -1,14 +1,15 @@
-.TH CAIRO-MSG 1 "20 July 14"
+.TH CAIRO-MSG 1 "29 July 14"
 .SH NAME
 cairo-msg \- display a message window
 .SH SYNOPSIS
-\fBcairo-msg\fP [ -u | -t | -p | -f ] [ -s \fImessage\fP ]
+\fBcairo-msg\fP [ -u | -t | -p | -f | -T ] [ -s \fImessage\fP ]
 .SH DESCRIPTION
 \fBcairo-msg\fP displays a short notification
 message in an \fIXwindow\fP on your screen at 
 the specified position [\fB-p\fP], with the specified
 level of \fIurgency\fP [\fB-u\fP], a \fItimeout\fP of
 [\fB-t seconds\fP]and \fIfont\fP [\fB-f font\fP]if specified.
+A [\fB-T "title"\fP] is also allowed.
 Only the [\fB-s\fP] option is mandatory as it has the message.
 .SS Options
 .TP
@@ -34,6 +35,15 @@ message. The default is 10 seconds. 0 is forever.
 .TP
 \fB-f "some font on your system"\fP
 \fIFont\fP. A font to display the message. The default is Dejavu Sans
+.TP
+\fB-r style(int)\fP
+\fIStyle\fP. [\fB0\fP] for nice rounded corners and no border; [\fB1\fP] for square corners
+and a 1px border. [\fB1\fP] is the default.
+.TP
+\fB-T "a title"\fP
+\fITitle\fP. A bold title limited to 20 characters
+in the message which restricts the message body 
+to the bottom line, a 36 character limit.
 .TP
 \fB-s "some message to display"\fP
 \fIMessage\fP. A message string to display which must be quoted
