@@ -28,8 +28,11 @@
 #include <string.h>
 #include <unistd.h>
 #include <signal.h>
+#include <math.h>
 
 #include "cairo-msg.h"
+
+#define _GNU_SOURCE
 
 float red;
 float green;
@@ -39,6 +42,7 @@ char msgStr1[40];
 char msgStr2[40];
 char *icon;
 unsigned int timeout;
+const char errmsg[31] = "The message input is too long.";
 
 struct { /* allows an icon */
 	cairo_surface_t *image;  
@@ -47,12 +51,14 @@ void usage(){
 	printf("%s-%s\n\n", prog , THIS_VERSION);
 	printf("\tA simple splash window based on Cairo and Xlib.\n\n");
 	printf("Usage :\n");
-	printf("\tcairo-msg [-u, -t, -p, -f] -s \"some message to display\"\n");
+	printf("\tcairo-msg [-u, -t, -p, -f, -T] -s \"some message to display\"\n");
 	printf("\t-u\t:urgency - l is low, n is normal or u is urgent\n");
 	printf("\t-t\t:timeout - value in seconds, default is 10, 0 is forever\n");
 	printf("\t-p\t:position - tl=top left, tc=top centre, tr=top right\n");
 	printf("\tcx=centre, bl=bottom left, bc=bottom centre, br=bottom right\n");
 	printf("\t-f\t:font - a font name\n");
+	printf("\t-r\t:style. 0 is no border, round corners; 1 has a border (default)\n");
+	printf("\t-T\t:Title - an optional title. Message is restricted to 36 chars\n");
 	printf("\tA limit of 36 chars per line is to keep it simple.\n");
 	printf("\tBy design %s is for very simple notifications.\n\n", prog);
 	printf("\tLicensed under the GPL version 2. All rights reserved.\n");
@@ -91,7 +97,7 @@ void format_input(char *message) {
 			break;
 		}
 		else if (i == 16) {
-			printf("Illegal entry!\n\n");
+			fprintf(stderr,"Illegal entry!\n\n");
 			usage();
 			exit(1);
 		}
@@ -104,20 +110,50 @@ void format_input(char *message) {
 	strncpy(str2, &message[index+1], strlen(message));
 	str2[strlen(message)] = '\0';	/* ensure \0 termination */
 	msgStr2[40] = sprintf(msgStr2, "%s", str2);
+	if (strlen(msgStr2) > 37) {
+		printf("%s\n", errmsg);
+		usage();
+		exit(1);
+	}
 }
-void paint(cairo_surface_t *cs, char *input, 
-			char *inputExtra, int sizex, int sizey, char *font) {
-	
+void paint(cairo_surface_t *cs, 
+				char *input, 
+				char *inputExtra, 
+				int sizex, 
+				int sizey, 
+				char *font,
+				char *weight,
+				int border) {
 	cairo_t *c;
 	c = cairo_create(cs);
 	cairo_select_font_face(c, font, CAIRO_FONT_SLANT_NORMAL,
 			CAIRO_FONT_WEIGHT_NORMAL);
 
 	cairo_set_font_size(c, 14.0);
-	cairo_rectangle(c, 0.0, 0.0, sizex, sizey);
-	/* urgent = 0.9, 0.2, 0.2 ; normal = 0.1, 0.3, 0.5 ; low = 0.3, 0.3, 0.3*/
-	cairo_set_source_rgba(c, red, green, blue, 0.85);
-	cairo_fill(c);
+	
+	if (border == 0) {
+		double x = 0;
+		double y = 0;
+		double width = sizex;
+		double height = sizey;
+		double aspect = 0.6;
+		double corner_radius = height / 10.0;
+		double radius = corner_radius / aspect;
+		double degrees = M_PI / 180.0;
+		cairo_new_sub_path (c);
+		cairo_arc (c, x + width - radius, y + radius, radius, -90 * degrees, 0 * degrees);
+		cairo_arc (c, x + width - radius, y + height - radius, radius, 0 * degrees, 90 * degrees);
+		cairo_arc (c, x + radius, y + height - radius, radius, 90 * degrees, 180 * degrees);
+		cairo_arc (c, x + radius, y + radius, radius, 180 * degrees, 270 * degrees);
+		cairo_close_path (c);
+		cairo_set_source_rgba(c, red, green, blue, 0.85);
+		cairo_fill_preserve (c);
+	} else {
+		cairo_rectangle(c, 0.0, 0.0, sizex, sizey);
+		cairo_set_source_rgba(c, red, green, blue, 0.85);
+		cairo_fill(c);
+	}
+	/* ^^^urgent = 0.9, 0.2, 0.2 ; normal = 0.1, 0.3, 0.5 ; low = 0.3, 0.3, 0.3*/
 	int icony;
 	if (sizey == 40) {
 		cairo_move_to(c, 51.0, 24.0);
@@ -129,12 +165,22 @@ void paint(cairo_surface_t *cs, char *input,
 		icony = 8;
 	}
 	else { /* 2 lines */
+		if (strcmp(weight, "normal") == 0) {
+			cairo_select_font_face(c, font, CAIRO_FONT_SLANT_NORMAL,
+				CAIRO_FONT_WEIGHT_NORMAL);
+		}
+		else {
+			cairo_select_font_face(c, font, CAIRO_FONT_SLANT_NORMAL,
+				CAIRO_FONT_WEIGHT_BOLD);
+		}
 		cairo_move_to(c, 51.0, 19.0);
 		cairo_set_source_rgb(c, 0.0, 0.0, 0.0);
 		cairo_show_text(c, input);
 		cairo_move_to(c, 50.0, 20.0);
 		cairo_set_source_rgb(c, 0.8, 0.8, 0.8);
 		cairo_show_text(c, input);
+		cairo_select_font_face(c, font, CAIRO_FONT_SLANT_NORMAL,
+				CAIRO_FONT_WEIGHT_NORMAL);
 		cairo_move_to(c, 51.0, 44.0);
 		cairo_set_source_rgb(c, 0.0, 0.0, 0.0);
 		cairo_show_text(c, inputExtra);
@@ -154,8 +200,15 @@ void paint(cairo_surface_t *cs, char *input,
 static void alarm_handler() {
 	exit(0); /* rough but works */
 }
-void showxlib(char *in, char *inExtra, int width, 
-				int height, unsigned int t, char *posi, char *fontype) {
+void showxlib(char *in, 
+				char *inExtra, 
+				int width, 
+				int height, 
+				unsigned int t, 
+				char *posi, 
+				char *fontype, 
+				char *fontweight,
+				int border) {
 	
 	Display *dpy;
 	Window rootwin;
@@ -216,7 +269,7 @@ void showxlib(char *in, char *inExtra, int width,
 		posy = dpyHeight - (height + 50);
 	}
 
-	win = XCreateWindow(dpy, rootwin, posx, posy, width, height, 1, mydepth, 
+	win = XCreateWindow(dpy, rootwin, posx, posy, width, height, border, mydepth, 
 			InputOutput, myvisual, CWOverrideRedirect, &attr);
 
 	XStoreName(dpy, win, prog);
@@ -227,7 +280,7 @@ void showxlib(char *in, char *inExtra, int width,
 	while (1) {
 		XNextEvent(dpy, &e);
 		if(e.type == Expose && e.xexpose.count < 1) {
-		paint(cs, in, inExtra, width, height, fontype);
+		paint(cs, in, inExtra, width, height, fontype, fontweight, border);
 		} 
 		else if (e.type == ButtonPress) break;
 	}
@@ -241,17 +294,21 @@ int main(int argc, char **argv) {
 	
 	int secs = 10;
 	int hsize = 320; int vsize = 40;
+	char *fontWeight = "normal";
+	int border = 1;
 	
 	char *uvalue = "n";
 	char *tvalue = NULL; /* timeout */
 	char *svalue = "cairo-msg: a splash based on Xlib and Cairo. (GPL2)";
 	char *pvalue = "br"; /* default pos is bottom right */
-	char *fvalue = "Dejavu Sans";
+	char *fvalue = "DejaVu Sans";
+	char *Tvalue = NULL;
+	char *rvalue = "1";
 	int c;
      
 	opterr = 0;
      
-	while ((c = getopt (argc, argv, "u:t:s:p:f:")) != -1) {
+	while ((c = getopt (argc, argv, "u:t:s:p:f:T:r:")) != -1) {
 		switch (c)
 		{
 			case 'u':
@@ -270,27 +327,56 @@ int main(int argc, char **argv) {
 			case 'f':
 				fvalue = optarg;
 				break;
+			case 'T':
+				Tvalue = optarg;
+				break;
+			case 'r':
+				rvalue = optarg;
+				border = atoi(rvalue);
+				break;
 			default:
 				usage();
 				exit(1);
 		}
 	}
 	urgency(uvalue);	
+	if (Tvalue) {
+		if (strlen(Tvalue) > 20) {
+			fprintf(stderr, "%s\n", errmsg);
+			usage();
+			return 1;
+		}
+	vsize = 60;
+	fontWeight = "bold";
+	}
 	if ((((strlen(svalue) * 8) + 10) > 320) &&
 							(((strlen(svalue) * 8) + 10) <= 640)) {
 		vsize = 60;
 	}
 	else if (strlen(svalue) > 70) {
-		printf("The message input is too long.\n");
+		fprintf(stderr, "%s\n", errmsg);
 		usage();
 		return 1;
 	}
 	if (vsize == 40) {
-		showxlib(svalue, NULL, hsize, vsize, secs, pvalue, fvalue);
+		showxlib(svalue, NULL, hsize, vsize, 
+				secs, pvalue, fvalue, fontWeight, border);
 	}
 	else {
-		format_input(svalue);
-		showxlib(msgStr1, msgStr2, hsize, vsize, secs, pvalue, fvalue);
+		if (strcmp(fontWeight, "bold") == 0) {
+			msgStr1[40] = sprintf(msgStr1, "%s", Tvalue);
+			if (strlen(svalue) > 36) {
+				fprintf(stderr, "%s\n", errmsg);
+				usage();
+				return 1;
+			}
+			msgStr2[40] = sprintf(msgStr2, "%s", svalue);
+		}
+		else {
+			format_input(svalue);
+		}
+		showxlib(msgStr1, msgStr2, hsize, vsize, 
+				secs, pvalue, fvalue, fontWeight, border);
 	}
 	return 0;
 }
